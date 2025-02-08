@@ -15,3 +15,5 @@
 local.properties
 service-account.json
 service-account.base64
+KeyStore.jks
+KeyStore.base64

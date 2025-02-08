@@ -36,14 +36,28 @@ jobs:
         run: |
           echo "${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}" | base64 --decode > app/google-services.json
 
+      - name: Decode and store keystore file
+        run: |
+          echo "${{ secrets.SIGNING_KEY_BASE64 }}" | base64 --decode > /tmp/KeyStore.jks
+
       - name: Run unit tests
         run: ./gradlew test
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          KEYSTORE_PATH: /tmp/KeyStore.jks
 
-      - name: Build APK
+      - name: Build Release APK
         run: ./gradlew assembleRelease
+        env:
+           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+           KEYSTORE_PATH: /tmp/KeyStore.jks
 
       - name: Upload APK (To Github Artifact)
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: app-release.apk
           path: app/build/outputs/apk/release/app-release.apk
@@ -51,10 +65,14 @@ jobs:
       - name: Generate Release Notes
         run: echo "${{ github.event.head_commit.message }}" > release-notes.txt
 
+      - name: Decode Firebase Service Account JSON
+        run: |
+          echo '${{ secrets.SERVICE_ACCOUNT_JSON_BASE64 }}' | base64 --decode > service-account.json
+
       - name: Upload APK (To Firebase App Distribution)
         uses: wzieba/Firebase-Distribution-Github-Action@v1
         with:
           appId: ${{secrets.FIREBASE_APP_ID}}
-          serviceCredentialsFileContent: ${{ secrets.SERVICE_ACCOUNT_KEY_JSON }}
-          groups: testers
+          serviceCredentialsFile: service-account.json
+          groups: TesterGroup #your tester group
           file: app/build/outputs/apk/release/app-release.apk
