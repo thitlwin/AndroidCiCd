@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "423853345436",
+    "project_id": "petsave-274e4",
+    "storage_bucket": "petsave-274e4.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:423853345436:android:4610995e4772c9b9547b59",
+        "android_client_info": {
+          "package_name": "com.realworld.android.petsave"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAeneCSmiaxZqF1K-zfyo___AJbvNKYKdc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:423853345436:android:ccbf2aa6f0070b5c547b59",
+        "android_client_info": {
+          "package_name": "com.thit.androidcicd"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAeneCSmiaxZqF1K-zfyo___AJbvNKYKdc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
