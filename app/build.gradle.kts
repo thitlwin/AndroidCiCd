@@ -1,8 +1,24 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     id("com.google.gms.google-services")
 }
+
+
+val keystoreProperties = if (rootProject.file("local.properties").exists()) {
+    Properties().apply {
+        load(rootProject.file("local.properties").inputStream())
+    }
+} else {
+    Properties() // Fallback for CI/CD without local.properties
+}
+
+val myKeystoreFilePath = System.getenv("KEYSTORE_PATH") ?: "../KeyStore.jks"
+val myStorePassword = System.getenv("KEYSTORE_PASSWORD") ?: keystoreProperties["storePassword"] as String
+val myKeyAlias = System.getenv("KEY_ALIAS") ?: keystoreProperties["keyAlias"] as String
+val myKeyPassword = System.getenv("KEY_PASSWORD") ?: keystoreProperties["keyPassword"] as String
 
 android {
     namespace = "com.thit.androidcicd"
@@ -18,6 +34,15 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = file(myKeystoreFilePath)
+            storePassword = myStorePassword
+            keyAlias = myKeyAlias
+            keyPassword = myKeyPassword
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -25,6 +50,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
         }
     }
     compileOptions {
