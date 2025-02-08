@@ -3,8 +3,6 @@ name: Build and Deploy to Playstore
 on:
   push:
     branches: [ release ] # Trigger on pushes to the release branch
-  pull_request:
-    branches: [ release ] # Trigger on pull requests targeting the release branch
 
 jobs:
   build:
@@ -33,31 +31,19 @@ jobs:
 
       - name: Decode and create google-services.json
         run: |
-          echo "${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}" | base64 --decode > app/google-services.json  
-
-      - name: Run unit tests
-        run: ./gradlew test
-
-      - name: Clean Gradle build
-        run: ./gradlew clean
+          echo "${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}" | base64 --decode > app/google-services.json
 
       - name: Decode and store keystore file
         run: |
-          echo "${{ secrets.SIGNING_KEY }}" | base64 --decode > /tmp/KeyStore.jks     
-#
-#      - name: Build Release APK
-#        run: ./gradlew assembleRelease
-#        env:
-#          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-#          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-#          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-#          KEYSTORE_PATH: /tmp/KeyStore.jks
-#
-#      - name: Upload Release APK (Optional - for release builds)
-#        uses: actions/upload-artifact@v4
-#        with:
-#          name: app-release.apk
-#          path: app/build/outputs/apk/release/app-release.apk
+          echo "${{ secrets.SIGNING_KEY_BASE64 }}" | base64 --decode > /tmp/KeyStore.jks     
+
+      - name: Run unit tests
+        run: ./gradlew test
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          KEYSTORE_PATH: /tmp/KeyStore.jks
 
       - name: Build Release Bundle
         run: ./gradlew bundleRelease
@@ -74,7 +60,7 @@ jobs:
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonPlainText: ${{ secrets.PLAYSTORE_SERVICE_ACCOUNT_JSON }}
-          packageName: com.thit.yawki
+          packageName: com.thit.androidcicd # your app's package name
           releaseFiles: app/build/outputs/bundle/release/app-release.aab
           track: internal #production,beta,alpha,internal
           status: inProgress
